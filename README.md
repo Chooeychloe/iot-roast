@@ -1,6 +1,6 @@
-# Kalabaw OOP Roast Review
+# IoT Roast Review
 
-A browser-based Java OOP quiz built with React and Vite. It is a static web app: no database or backend is required.
+A browser-based Internet of Things quiz built with React and Vite, covering Web and Cloud of Things, data visualization, security, ethics and privacy, and IoT system design. It is a static web app: no database or backend is required.
 
 ## Run locally
 
@@ -19,6 +19,6 @@ The production site is written to `dist/`. On a static host, set the build comma
 
 ## Browser notes
 
-- Questions, custom questions, settings, and scores are stored in that browser's local storage. They do not sync between browsers or devices.
-- Voice uses the browser's Web Speech API and voices installed or exposed by the user's device. Voice availability and sound vary by browser and operating system. If speech synthesis is unavailable, the quiz text still works.
+- Questions, custom questions, and settings are stored in that browser's local storage. They do not sync between browsers or devices.
+- Roasts display as text only. Each round calculates the exact percentage from correct answers divided by questions in the round, and shows results by IoT module.
 - The display font is loaded from Google Fonts; system fonts are used if that request is unavailable.

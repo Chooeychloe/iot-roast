@@ -9,25 +9,19 @@ function add(id, displayText, elevenLabsText = displayText) {
   rows.push([id, `${id}.mp3`, displayText, elevenLabsText]);
 }
 
-for (const [bankName, bank] of [["savage", ROASTS.savage], ["iot", ROASTS.iot]]) {
-  for (const [category, messages] of Object.entries(bank)) {
-    const categoryId = category.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-    messages.forEach((text, index) => {
-      add(`${bankName}-${categoryId}-${pad(index + 1)}`, text);
-    });
-  }
+for (const [category, messages] of Object.entries(ROASTS.iot)) {
+  const categoryId = category.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+  messages.forEach((text, index) => {
+    add(`iot-${categoryId}-${pad(index + 1)}`, text);
+  });
 }
-
-ROASTS.streakGood.forEach((text, index) => {
-  add(`streak-good-${pad(index + 1)}`, text);
-});
 
 for (const [score, messages] of ENDINGS) {
   messages.forEach((text, index) => add(`ending-${score}-${pad(index + 1)}`, text));
 }
 
-add("welcome", "O siya, ready ka na bang araruhin ng OOP?");
-add("round-start", "Sige, simulan natin. Tingnan natin kung may natira sa utak mo pagkatapos ng lecture.");
+add("welcome", "O siya, ready ka na bang i-connect ang utak mo sa IoT?");
+add("round-start", "Sige, simulan natin. Tingnan natin kung may signal ang IoT knowledge mo.");
 add("setup-return", "Back to the lobby, rookie.");
 
 await mkdir("public/audio", { recursive: true });

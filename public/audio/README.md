@@ -1,22 +1,3 @@
-# ElevenLabs voice tracks
+# Archived audio assets
 
-Download or export one MP3 for every row in `manifest.csv`. Use the row's `elevenlabs_text` as the script and save the audio using its exact `filename` in this folder. Regenerate the manifest after changing roast text with `npm run audio:manifest`.
-
-The quiz uses one roast style: savage. IoT module questions use topic-specific savage tracks; OOP questions use the general savage tracks.
-
-Examples:
-
-- `savage-bad-01.mp3`
-- `savage-timeout-03.mp3`
-- `iot-bad-01.mp3`
-- `iot-streak-good-01.mp3`
-- `streak-good-02.mp3`
-- `ending-80-02.mp3`
-- `welcome.mp3`
-- `round-start.mp3`
-
-The app plays a matching MP3 when it exists. If a track is missing or cannot play, it falls back to the browser/device speech voice. Turn Voice off to mute both.
-
-The current streak count stays visible in the quiz HUD. Streak roast scripts are fixed phrases, so each one has an exact matching MP3 script without placeholders.
-
-After adding tracks, run the production build and deploy the `dist/` folder as usual. Files in `public/audio/` are copied into the production output.
+The quiz no longer loads audio files or uses device speech. Roasts and feedback appear as text in the app. The MP3 files and `manifest.csv` remain in this folder as archived project assets and are not needed to build or run the quiz.

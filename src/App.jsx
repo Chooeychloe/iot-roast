@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { QUESTIONS, ROASTS, ENDINGS, shuffle } from "./data";
 
 const DEFAULT_SECONDS = 20;
 const MIN_SECONDS = 5;
 const MAX_SECONDS = 300;
-const gradePercent = (score, total) => {
-  const actualPercent = total ? (score / total) * 100 : 0;
-  return ENDINGS.find(([threshold]) => actualPercent >= threshold)?.[0] ?? 0;
-};
-const twoDigits = (n) => String(n).padStart(2, "0");
+const gradePercent = (score, total) => total ? Math.round((score / total) * 10000) / 100 : 0;
 const choiceBags = new WeakMap();
 const lastChoiceByPool = new WeakMap();
 const choose = (items) => {
@@ -24,7 +20,7 @@ const choose = (items) => {
 
   const choice = bag.pop();
   lastChoiceByPool.set(items, choice.index);
-  return { text: choice.text, index: choice.index + 1 };
+  return choice.text;
 };
 
 function useLocalStorage(key, init) {
@@ -38,41 +34,53 @@ function useLocalStorage(key, init) {
 }
 
 /* ---------- Mascot ---------- */
-function Mascot({ mood, talking, tick }) {
+function Mascot({ mood, tick }) {
   const browL = mood === "mad" ? "rotate-[22deg] translate-y-0.5" : mood === "glad" ? "-translate-y-1" : "";
   const browR = mood === "mad" ? "-rotate-[22deg] translate-y-0.5" : mood === "glad" ? "-translate-y-1" : "";
   const body = mood === "mad" ? "animate-shake" : mood === "glad" ? "animate-hop" : "";
   const brow = "origin-center [transform-box:fill-box] transition-transform duration-200";
   return (
-    <svg viewBox="0 0 300 270" role="img" aria-label="A talking cartoon kalabaw" className="w-44 shrink-0 overflow-visible sm:w-56 md:w-64">
+    <svg viewBox="0 0 300 270" role="img" aria-label="An IoT robot mascot with a wireless antenna and sensor display" className="w-44 shrink-0 overflow-visible sm:w-56 md:w-64">
       <g key={tick} className={body}>
-        {/* Tail and hooves */}
-        <path d="M45 145C20 153 28 184 14 191M14 191l-7-4m7 4-6 7" fill="none" stroke="#37312d" strokeWidth="5" strokeLinecap="round" />
-        <path d="M75 187l-8 42q-2 9-13 8l-11-2 3-9 13-4 6-37m39 1 3 42q1 10-10 10H83l2-9 13-4-2-38m83-5 5 43q1 9-9 10h-16l1-9 12-5-5-38m39-10 8 41q2 10-9 12h-17l-1-9 13-6-10-41" fill="#cbc5b9" stroke="#37312d" strokeWidth="5" strokeLinejoin="round" />
-        <path d="M44 226l-3 9 15 2q8-1 11-7m17 7v8h17q7-2 7-8m49-2 1 9h17q8-2 8-9m14-2 2 10h17q8-2 7-10" fill="#77736d" stroke="#37312d" strokeWidth="4" strokeLinejoin="round" />
-        {/* Big sturdy body */}
-        <ellipse cx="117" cy="145" rx="86" ry="62" fill="#d9d3c7" stroke="#37312d" strokeWidth="5" />
-        <path d="M57 175q34 31 83 13" fill="none" stroke="#aaa397" strokeWidth="5" strokeLinecap="round" />
-        <path d="M54 106q8-15 25-18m88 120q22-7 30-22" fill="none" stroke="#aaa397" strokeWidth="4" strokeLinecap="round" />
-        {/* Head, ears and unmistakable curved kalabaw horns */}
-        <path d="M173 83C137 79 130 51 139 34c12 15 28 21 44 18 9-2 16-8 24-17-2 25-12 43-34 48m60 0c35-4 42-32 31-49-13 14-29 19-45 15-9-2-16-8-23-18 1 26 10 44 32 51" fill="#8b8984" stroke="#37312d" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M164 74q-12-9-21-3m100 3q12-9 21-3" fill="none" stroke="#37312d" strokeWidth="5" strokeLinecap="round" />
-        <path d="M170 75q4-15 20-17h28q17 1 23 17l4 52q1 33-34 40-34-3-38-35z" fill="#d9d3c7" stroke="#37312d" strokeWidth="5" strokeLinejoin="round" />
-        <path d="M165 96q-9-12-18-5 3 14 17 15m82-10q10-11 18-3-4 14-17 14" fill="#c8c0b3" stroke="#37312d" strokeWidth="4" strokeLinejoin="round" />
-        <ellipse cx="184" cy="94" rx="8" ry="10" fill="#fff" /><ellipse cx="223" cy="94" rx="8" ry="10" fill="#fff" />
-        <circle cx="187" cy="96" r="4.5" fill="#241a4d" /><circle cx="225" cy="96" r="4.5" fill="#241a4d" />
-        <rect x="175" y="77" width="20" height="5" rx="3" fill="#37312d" className={`${brow} ${browL}`} />
-        <rect x="213" y="77" width="20" height="5" rx="3" fill="#37312d" className={`${brow} ${browR}`} />
-        <ellipse cx="205" cy="126" rx="32" ry="23" fill="#e5bcae" stroke="#37312d" strokeWidth="5" />
-        <ellipse cx="193" cy="123" rx="5" ry="7" fill="#37312d" transform="rotate(20 193 123)" />
-        <ellipse cx="216" cy="123" rx="5" ry="7" fill="#37312d" transform="rotate(-20 216 123)" />
-        <path d="M192 143q13 12 27 0" fill="none" stroke="#37312d" strokeWidth="4" strokeLinecap="round" />
+        <ellipse cx="150" cy="252" rx="77" ry="9" fill="#241a4d" opacity=".12" />
+        {/* Wireless antenna and signal arcs */}
+        <path d="M150 49V32" stroke="#37312d" strokeWidth="6" strokeLinecap="round" />
+        <path d="M137 28q13-13 26 0m-21 5q8-8 16 0" fill="none" stroke="#258b78" strokeWidth="3.5" strokeLinecap="round" />
+        <circle cx="150" cy="37" r="4" fill="#258b78" />
+        <circle cx="150" cy="25" r="8" fill="#f2c94c" stroke="#37312d" strokeWidth="4" />
+        {/* Side sensor modules */}
+        <rect x="72" y="88" width="24" height="42" rx="9" fill="#4f8e78" stroke="#37312d" strokeWidth="4" />
+        <circle cx="84" cy="101" r="4" fill="#c8f5dc" /><circle cx="84" cy="117" r="4" fill="#f2c94c" />
+        <rect x="204" y="88" width="24" height="42" rx="9" fill="#4f8e78" stroke="#37312d" strokeWidth="4" />
+        <circle cx="216" cy="101" r="4" fill="#c8f5dc" /><circle cx="216" cy="117" r="4" fill="#f2c94c" />
+        {/* Compact robot body */}
+        <path d="M119 148v15h62v-15" fill="#8b8984" stroke="#37312d" strokeWidth="5" strokeLinejoin="round" />
+        <rect x="101" y="158" width="98" height="82" rx="20" fill="#d9d3c7" stroke="#37312d" strokeWidth="5" />
+        <path d="M105 178h-14q-9 0-9 9v24q0 8 8 8h13m96-41h14q9 0 9 9v24q0 8-8 8h-13" fill="#cbc5b9" stroke="#37312d" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="89" cy="202" r="7" fill="#4f8e78" stroke="#37312d" strokeWidth="3" />
+        <circle cx="211" cy="202" r="7" fill="#4f8e78" stroke="#37312d" strokeWidth="3" />
+        {/* Chest telemetry display */}
+        <rect x="121" y="174" width="58" height="48" rx="9" fill="#263d48" stroke="#37312d" strokeWidth="4" />
+        <rect x="128" y="180" width="44" height="27" rx="4" fill="#b9e8d5" />
+        <path d="M132 200l8-9 7 5 8-10 11 7" fill="none" stroke="#258b78" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="134" cy="214" r="2.5" fill="#79e0a7" /><circle cx="142" cy="214" r="2.5" fill="#f2c94c" />
+        <text x="160" y="217" textAnchor="middle" fontSize="9" fontWeight="800" fill="#fff" fontFamily="system-ui, sans-serif">IoT</text>
+        {/* Short articulated legs and sturdy feet */}
+        <path d="M122 239v10m56-10v10" stroke="#37312d" strokeWidth="9" strokeLinecap="round" />
+        <path d="M108 253q0-7 8-7h15q8 0 8 7v2h-31zm50 0q0-7 8-7h15q8 0 8 7v2h-31z" fill="#4f8e78" stroke="#37312d" strokeWidth="4" strokeLinejoin="round" />
+        {/* Rounded screen head */}
+        <rect x="91" y="49" width="118" height="105" rx="28" fill="#d9d3c7" stroke="#37312d" strokeWidth="5" />
+        <rect x="104" y="65" width="92" height="72" rx="20" fill="#263d48" stroke="#37312d" strokeWidth="4" />
+        <rect x="116" y="82" width="21" height="25" rx="10" fill="#c8f5dc" />
+        <rect x="163" y="82" width="21" height="25" rx="10" fill="#c8f5dc" />
+        <circle cx="127" cy="94" r="5" fill="#258b78" /><circle cx="174" cy="94" r="5" fill="#258b78" />
+        <rect x="117" y="73" width="20" height="5" rx="3" fill="#d9d3c7" className={`${brow} ${browL}`} />
+        <rect x="163" y="73" width="20" height="5" rx="3" fill="#d9d3c7" className={`${brow} ${browR}`} />
         <g className={`transition-opacity ${mood === "glad" ? "opacity-70" : "opacity-0"}`}>
-          <circle cx="178" cy="111" r="6" fill="#ed8991" /><circle cx="232" cy="111" r="6" fill="#ed8991" />
+          <circle cx="110" cy="117" r="5" fill="#ed8991" /><circle cx="190" cy="117" r="5" fill="#ed8991" />
         </g>
-        <g className={talking ? "animate-flap" : ""} style={{ transformOrigin: "207px 145px" }}>
-          <path d="M194 145q13 12 27 0-2 15-14 16-11-2-13-16" fill="#683a3a" stroke="#37312d" strokeWidth="3" strokeLinejoin="round" />
-        </g>
+        <path d="M141 117q9 8 18 0" fill="none" stroke="#c8f5dc" strokeWidth="3.5" strokeLinecap="round" />
+        <path d="M141 119q9 8 18 0" fill="none" stroke="#ed8991" strokeWidth="3" strokeLinecap="round" />
       </g>
     </svg>
   );
@@ -89,114 +97,38 @@ const input = "w-full rounded-xl border-2 border-violet-200 bg-violet-50 px-3 py
 
 /* ---------- App ---------- */
 export default function App() {
+  useEffect(() => {
+    document.title = "IoT Robot Roast | IoT Quiz by Sir Dhan";
+  }, []);
+
   const [screen, setScreen] = useState("setup");
-  const [cfg, setCfg] = useLocalStorage("oop-cfg", { off: [], count: 10, timer: false, seconds: DEFAULT_SECONDS, voice: true });
-  const [custom, setCustom] = useLocalStorage("oop-custom", []);
+  const [cfg, setCfg] = useLocalStorage("iot-cfg", { off: [], count: 10, timer: false, seconds: DEFAULT_SECONDS });
+  const [custom, setCustom] = useLocalStorage("iot-custom", []);
   const [deck, setDeck] = useState([]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState(null);
   const [score, setScore] = useState(0);
+  const [responses, setResponses] = useState([]);
   const [streak, setStreak] = useState({ good: 0, bad: 0 });
   const [missed, setMissed] = useState([]);
   const [ending, setEnding] = useState("");
   const [supportOpen, setSupportOpen] = useState(false);
   const [left, setLeft] = useState(DEFAULT_SECONDS);
   const [nextCountdown, setNextCountdown] = useState(5);
-  const [line, setLine] = useState("O siya, ready ka na bang araruhin ng OOP?");
+  const [line, setLine] = useState("Ready na ba ang IoT knowledge mo? Tingnan natin kung may signal.");
   const [mood, setMood] = useState("");
-  const [talking, setTalking] = useState(false);
   const [tick, setTick] = useState(0);
-  const [voices, setVoices] = useState([]);
-  const talkT = useRef();
-  const audioRef = useRef(null);
-  const speechSupported = typeof window !== "undefined"
-    && "speechSynthesis" in window
-    && "SpeechSynthesisUtterance" in window;
-
-  useEffect(() => {
-    if (!("speechSynthesis" in window)) return;
-    const synth = window.speechSynthesis;
-    const loadVoices = () => setVoices(synth.getVoices() || []);
-    loadVoices();
-    const previousHandler = synth.onvoiceschanged;
-    synth.onvoiceschanged = loadVoices;
-    return () => {
-      if (synth.onvoiceschanged === loadVoices) synth.onvoiceschanged = previousHandler;
-    };
-  }, []);
-
-  useEffect(() => () => {
-    clearTimeout(talkT.current);
-    audioRef.current?.pause();
-    window.speechSynthesis?.cancel();
-  }, []);
-
-  const filipinoVoice = voices.find((voice) => /^(fil|tl)(-|$)/i.test(voice.lang));
   const secondsPerQuestion = Math.min(Math.max(Math.floor(Number(cfg.seconds) || DEFAULT_SECONDS), MIN_SECONDS), MAX_SECONDS);
 
-  const all = [...QUESTIONS, ...custom];
+  const all = [...QUESTIONS, ...custom.filter((question) => question.topic?.startsWith("IoT Module"))];
   const topics = [...new Set(all.map((q) => q.topic))];
   const pool = all.filter((q) => !cfg.off.includes(q.topic));
   const set = (patch) => setCfg((c) => ({ ...c, ...patch }));
 
-  /* Prefer downloaded ElevenLabs tracks; use the device voice until a track is added. */
-  const say = (text, m = "", audioId) => {
-    setLine(text); setMood(m); setTick((t) => t + 1); setTalking(true);
-    clearTimeout(talkT.current);
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    if (speechSupported) window.speechSynthesis.cancel();
-    if (!cfg.voice) {
-      setTalking(false);
-      return;
-    }
-
-    const speakWithDeviceVoice = () => {
-      if (speechSupported) {
-        try {
-          const synth = window.speechSynthesis;
-          const u = new window.SpeechSynthesisUtterance(text);
-          const availableVoices = voices.length ? voices : synth.getVoices();
-          const voice = filipinoVoice || availableVoices.find((v) => /^(fil|tl)(-|$)/i.test(v.lang));
-          u.lang = voice?.lang || "fil-PH";
-          if (voice) u.voice = voice;
-          u.pitch = m === "mad" ? 1.08 : 1;
-          u.rate = 0.94;
-          u.onend = u.onerror = () => setTalking(false);
-          synth.speak(u);
-          talkT.current = setTimeout(() => setTalking(false), Math.max(4000, text.length * 130));
-          return;
-        } catch { /* fall through to silent flap */ }
-      }
-      talkT.current = setTimeout(() => setTalking(false), Math.max(900, text.length * 55));
-    };
-
-    if (audioId) {
-      try {
-        const audio = new window.Audio(`${import.meta.env.BASE_URL}audio/${audioId}.mp3`);
-        let failed = false;
-        const fallback = () => {
-          if (failed || audioRef.current !== audio) return;
-          failed = true;
-          audioRef.current = null;
-          speakWithDeviceVoice();
-        };
-        audioRef.current = audio;
-        audio.onended = () => {
-          if (audioRef.current === audio) {
-            audioRef.current = null;
-            setTalking(false);
-          }
-        };
-        audio.onerror = fallback;
-        const playRequest = audio.play();
-        playRequest?.catch(fallback);
-        return;
-      } catch { /* fall back to the device voice */ }
-    }
-    speakWithDeviceVoice();
+  const showRoast = (text, m = "") => {
+    setLine(text);
+    setMood(m);
+    setTick((t) => t + 1);
   };
 
   const start = () => {
@@ -204,54 +136,44 @@ export default function App() {
     const d = shuffle(pool).slice(0, cfg.count).map((q) => ({
       ...q, opts: shuffle(q.o.map((t, i) => ({ t, ok: i === q.a }))),
     }));
-    setDeck(d); setIdx(0); setPicked(null); setScore(0); setStreak({ good: 0, bad: 0 }); setMissed([]);
+    setDeck(d); setIdx(0); setPicked(null); setScore(0); setResponses([]); setStreak({ good: 0, bad: 0 }); setMissed([]);
     setScreen("quiz");
-    say("Sige, simulan natin. Tingnan natin kung may natira sa utak mo pagkatapos ng lecture.", "", "round-start");
+    showRoast("Sige, simulan natin. Tingnan natin kung may signal ang IoT knowledge mo.");
   };
 
   const answer = (i) => {
     if (picked !== null) return;
     setPicked(i);
     const ok = i >= 0 && deck[idx].opts[i].ok;
+    setResponses((items) => [...items, { topic: deck[idx].topic, correct: ok }]);
     if (!ok) setMissed((items) => [...items, { question: deck[idx], answer: i < 0 ? "No answer (time ran out)" : deck[idx].opts[i].t }]);
-    const iotQuestion = deck[idx].topic.startsWith("IoT Module");
-    const R = iotQuestion ? ROASTS.iot : ROASTS.savage;
-    const roastPrefix = iotQuestion ? "iot" : "savage";
+    const R = ROASTS.iot;
     const g = ok ? streak.good + 1 : 0, b = ok ? 0 : streak.bad + 1;
     setStreak({ good: g, bad: b });
     if (ok) setScore((s) => s + 1);
     let chosen;
-    let audioId;
     if (ok && g >= 3) {
-      chosen = choose(iotQuestion ? ROASTS.iot.streakGood : ROASTS.streakGood);
-      audioId = iotQuestion
-        ? `iot-streak-good-${twoDigits(chosen.index)}`
-        : `streak-good-${twoDigits(chosen.index)}`;
+      chosen = choose(ROASTS.iot.streakGood);
     } else if (ok) {
       chosen = choose(R.good);
-      audioId = `${roastPrefix}-good-${twoDigits(chosen.index)}`;
     } else if (i === -1) {
       chosen = choose(R.timeout);
-      audioId = `${roastPrefix}-timeout-${twoDigits(chosen.index)}`;
     } else if (b >= 2) {
       chosen = choose(R.streakBad);
-      audioId = `${roastPrefix}-streak-bad-${twoDigits(chosen.index)}`;
     } else {
       chosen = choose(R.bad);
-      audioId = `${roastPrefix}-bad-${twoDigits(chosen.index)}`;
     }
-    say(chosen.text, ok ? "glad" : "mad", audioId);
+    showRoast(chosen, ok ? "glad" : "mad");
   };
 
   const next = () => {
     if (idx + 1 >= deck.length) {
       const pct = gradePercent(score, deck.length);
-      const [bracket, messages] = ENDINGS.find(([threshold]) => threshold === pct);
-      const chosen = choose(messages);
-      const finalLine = chosen.text;
+      const messages = ENDINGS.find(([threshold]) => pct >= threshold)?.[1] ?? ENDINGS.at(-1)[1];
+      const finalLine = choose(messages).replaceAll("{score}", pct.toFixed(2));
       setEnding(finalLine);
       setScreen("end");
-      say(finalLine, pct >= 80 ? "glad" : "mad", `ending-${bracket}-${twoDigits(chosen.index)}`);
+      showRoast(finalLine, pct >= 80 ? "glad" : "mad");
     } else { setIdx(idx + 1); setPicked(null); setMood(""); }
   };
 
@@ -278,6 +200,13 @@ export default function App() {
 
   const q = deck[idx];
   const pct = gradePercent(score, deck.length);
+  const moduleScores = responses.reduce((scores, response) => {
+    const module = scores[response.topic] ?? { correct: 0, total: 0 };
+    module.total += 1;
+    if (response.correct) module.correct += 1;
+    scores[response.topic] = module;
+    return scores;
+  }, {});
 
   return (
     <div className="flex min-h-screen flex-col bg-violet-50 font-sans text-violet-950 dark:bg-night dark:text-violet-50">
@@ -294,28 +223,7 @@ export default function App() {
               ${mood === "mad" ? "border-red-500" : mood === "glad" ? "border-emerald-500" : "border-violet-900 dark:border-violet-200"}`} />
           </div>
           <div className="flex w-full items-center justify-center gap-1">
-            <div className="flex w-28 shrink-0 flex-col items-center gap-2">
-            <button className={`${chip(cfg.voice)} max-w-full whitespace-normal px-2 text-xs`} aria-pressed={cfg.voice}
-              title="Plays your public/audio MP3 tracks when present; otherwise uses the device voice."
-              onClick={() => {
-                set({ voice: !cfg.voice });
-                if (cfg.voice) {
-                  clearTimeout(talkT.current);
-                  audioRef.current?.pause();
-                  audioRef.current = null;
-                  window.speechSynthesis?.cancel();
-                  setTalking(false);
-                }
-              }}>
-              {cfg.voice ? "Voice on" : "Voice off"}
-            </button>
-            {screen === "setup" && (
-              <button className={`${chip(false)} max-w-full whitespace-normal px-2 text-xs`} disabled={!cfg.voice} onClick={() => say("O siya, ready ka na bang araruhin ng OOP?", "", "welcome")}>
-                Replay welcome
-              </button>
-            )}
-            </div>
-            <Mascot mood={mood} talking={talking} tick={tick} />
+            <Mascot mood={mood} tick={tick} />
           </div>
         </aside>
 
@@ -331,7 +239,7 @@ export default function App() {
                 setScreen("setup");
                 setPicked(null);
                 setMood("");
-                say("Back to the lobby, rookie.", "", "setup-return");
+                showRoast("Back to the lobby, rookie.");
               }}>← Back to lobby</button>
               <div className="mb-3 flex items-center justify-between font-bold text-violet-700 dark:text-violet-300">
                 <span>Question {idx + 1} of {deck.length}</span>
@@ -372,10 +280,21 @@ export default function App() {
           {screen === "end" && (
             <section>
               <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Final grade</h1>
-              <p className="my-2 flex flex-wrap items-baseline gap-x-3 text-4xl font-extrabold tracking-tight sm:text-6xl"><span>{score} / {deck.length}</span><span className="text-xl text-violet-500 sm:text-2xl">({pct}%)</span></p>
-              <p className="mb-4 text-sm text-violet-700 dark:text-violet-300">
-                The count is your exact number correct. The percentage is a score band, so it may not equal your exact score divided by {deck.length}: below 30% is 0%, 30–54% is 30%, 55–79% is 55%, 80–99% is 80%, and a perfect score is 100%.
-              </p>
+              <p className="my-2 flex flex-wrap items-baseline gap-x-3 text-4xl font-extrabold tracking-tight sm:text-6xl"><span>{score} / {deck.length}</span><span className="text-xl text-violet-500 sm:text-2xl">({pct.toFixed(2)}%)</span></p>
+              <div className="mb-5 rounded-2xl border-2 border-violet-200 p-4 dark:border-violet-800">
+                <p className="mb-3 text-sm text-violet-700 dark:text-violet-300">
+                  Exact score: {score} correct out of {deck.length} questions. Percentage = correct / total x 100, rounded to two decimal places. {missed.length} wrong, {Math.max(deck.length - responses.length, 0)} unanswered.
+                </p>
+                <h2 className="mb-2 font-bold">Score by IoT module</h2>
+                <dl className="grid gap-2 sm:grid-cols-2">
+                  {Object.entries(moduleScores).map(([topic, result]) => (
+                    <div key={topic} className="rounded-xl bg-violet-50 p-3 dark:bg-night">
+                      <dt className="text-sm">{topic}</dt>
+                      <dd className="font-extrabold">{result.correct} / {result.total} ({gradePercent(result.correct, result.total).toFixed(2)}%)</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
               <p className="mb-5 text-violet-700 dark:text-violet-300">{ending}</p>
               {missed.length > 0 && (
                 <details className="mb-5 rounded-2xl border-2 border-violet-200 p-4 dark:border-violet-800">
@@ -394,7 +313,7 @@ export default function App() {
               )}
               <div className="flex flex-wrap gap-3">
                 <button className={btn} onClick={start}>Try again</button>
-                <button className={chip(false)} onClick={() => { setScreen("setup"); say("Back to the lobby, rookie.", "", "setup-return"); }}>Change settings</button>
+                <button className={chip(false)} onClick={() => { setScreen("setup"); showRoast("Back to the lobby, rookie."); }}>Change settings</button>
               </div>
             </section>
           )}
@@ -404,9 +323,9 @@ export default function App() {
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-5 px-4 py-4 text-center text-sm text-violet-600 dark:text-violet-300 md:flex-row md:text-left">
           <div className="flex flex-col items-center gap-2 md:items-end">
             <p>
-              Built for OOP survivors by <span className="font-extrabold text-violet-900 dark:text-white">Sir Dhan</span>
+              Built for IoT survivors by <span className="font-extrabold text-violet-900 dark:text-white">Sir Dhan</span>
               <span aria-hidden="true"> | </span>
-              <span>Powered by Java, kalabaw energy, and questionable confidence.</span>
+              <span>Powered by sensors, robot energy, and questionable confidence.</span>
             </p>
             <nav aria-label="Sir Dhan's social profiles and support" className="flex flex-wrap items-center justify-center gap-2">
             <button className={`${chip(false)} whitespace-nowrap`} aria-haspopup="dialog" onClick={() => setSupportOpen(true)}>
@@ -445,7 +364,7 @@ export default function App() {
 
 /* ---------- Setup screen: everything here shapes the next round ---------- */
 function Setup({ cfg, set, topics, all, pool, custom, setCustom, start }) {
-  const [form, setForm] = useState({ q: "", a: "", b: "", c: "", d: "", e: "", topic: "Custom" });
+  const [form, setForm] = useState({ q: "", a: "", b: "", c: "", d: "", e: "", topic: "IoT Module 5: Web and Cloud of Things" });
   const f = (k) => ({ value: form[k], onChange: (ev) => setForm({ ...form, [k]: ev.target.value }) });
   const valid = form.q && form.a && form.b && form.c && form.d;
   const max = Math.max(pool.length, 1);
@@ -456,14 +375,14 @@ function Setup({ cfg, set, topics, all, pool, custom, setCustom, start }) {
   const add = (ev) => {
     ev.preventDefault();
     if (!valid) return;
-    setCustom([...custom, { topic: form.topic.trim() || "Custom", q: form.q, o: [form.a, form.b, form.c, form.d], a: 0, e: form.e || "No explanation given. The kalabaw is judging you." }]);
+    setCustom([...custom, { topic: form.topic.trim() || "Custom", q: form.q, o: [form.a, form.b, form.c, form.d], a: 0, e: form.e || "No explanation given. The robot is judging you." }]);
     setForm({ q: "", a: "", b: "", c: "", d: "", e: "", topic: form.topic });
   };
   return (
     <section className="grid gap-6">
       <div>
-        <h1 className="mb-2 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">Kalabaw will judge your OOP.</h1>
-        <p className="text-violet-700 dark:text-violet-300">Pick your topics, set the question count, and add your own questions. Kalabaw comes in one setting: savage.</p>
+        <h1 className="mb-2 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">The IoT robot will judge your knowledge.</h1>
+        <p className="text-violet-700 dark:text-violet-300">Pick your IoT modules, set the question count, and add your own IoT questions. The robot comes in one setting: savage.</p>
       </div>
 
       <div>
@@ -524,7 +443,9 @@ function Setup({ cfg, set, topics, all, pool, custom, setCustom, start }) {
           <input className={input} placeholder="Wrong answer 2" {...f("c")} />
           <input className={input} placeholder="Wrong answer 3" {...f("d")} />
           <input className={input} placeholder="Explanation (optional)" {...f("e")} />
-          <input className={input} placeholder="Topic" {...f("topic")} />
+          <select className={input} aria-label="IoT module" {...f("topic")}>
+            {topics.map((topic) => <option key={topic} value={topic}>{topic}</option>)}
+          </select>
           <div className="flex gap-3">
             <button className={btn} disabled={!valid}>Save question</button>
             {custom.length > 0 && <button type="button" className={chip(false)} onClick={() => setCustom([])}>Delete all custom</button>}
